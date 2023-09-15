@@ -57,7 +57,7 @@ model Borrows {
 
 model Author {
   id           String     @id @default(uuid())
-  name         String
+  name         String     @unique
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
   books        Book[]

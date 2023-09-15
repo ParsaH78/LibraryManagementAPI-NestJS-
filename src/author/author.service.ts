@@ -1,26 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthorService {
-  create(createAuthorDto: CreateAuthorDto) {
-    return 'This action adds a new author';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(createAuthorDto: CreateAuthorDto) {
+    const author = await this.findOneByName(createAuthorDto.name);
+
+    if (author) {
+      throw new ConflictException('Author already exists !');
+    }
+
+    const new_author = await this.prismaService.author.create({
+      data: createAuthorDto,
+    });
+
+    return new_author;
   }
 
-  findAll() {
-    return `This action returns all author`;
+  async findAll() {
+    return await this.prismaService.author.findMany({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} author`;
+  async findOne(id: string) {
+    return await this.prismaService.author.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    return `This action updates a #${id} author`;
+  async findOneByName(name: string) {
+    return this.prismaService.author.findUnique({
+      where: {
+        name,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} author`;
+  async update(id: string, updateAuthorDto: UpdateAuthorDto) {
+    const author = await this.findOne(id);
+
+    if (!author) {
+      throw new ConflictException('Author already exists !');
+    }
+
+    const new_author = await this.prismaService.author.update({
+      where: {
+        id,
+      },
+      data: updateAuthorDto,
+    });
+
+    return new_author;
+  }
+
+  async remove(id: string) {
+    const author = await this.prismaService.author.delete({
+      where: {
+        id,
+      },
+    });
+    return `Author ${author.name} has been deleted !`;
   }
 }

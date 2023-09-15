@@ -10,6 +10,6 @@ export class BookController {
   @Roles('ADMIN')
   @Post('/')
   createBook(@Body() body: CreateBookDto) {
-    return this.bookService.createBook(body);
+    return body;
   }
 }
