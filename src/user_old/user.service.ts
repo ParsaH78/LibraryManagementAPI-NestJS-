@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserResponseDto } from './dtos/user.dto';
-import { UpdateUser, selectUserData } from './interfaces/user.interface';
+import { SelectUserDto, UpdateUserDto, UserResponseDto } from './dtos/user.dto';
 
-export const userData: selectUserData = {
+export const userData: SelectUserDto = {
   username: true,
   email: true,
   phone_number: true,
@@ -23,7 +22,7 @@ export class UserService {
     return new UserResponseDto(user);
   }
 
-  async updateUser(data: UpdateUser, id: string) {
+  async updateUser(data: UpdateUserDto, id: string) {
     const user = await this.userExistence(id);
 
     if (!user) {
@@ -57,7 +56,7 @@ export class UserService {
     return { message: user.username + ' Deleted !' };
   }
 
-  async userExistence(id: string, select: selectUserData = { username: true }) {
+  async userExistence(id: string, select: SelectUserDto = { username: true }) {
     const user = await this.prismaService.user.findUnique({
       where: {
         id,

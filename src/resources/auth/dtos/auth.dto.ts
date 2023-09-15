@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsString,
   IsEmail,
-  IsOptional,
   Matches,
   MinLength,
   MaxLength
@@ -38,9 +37,6 @@ export class SignUpDto {
   @IsString()
   address: string;
 
-  @IsOptional()
-  @IsString()
-  product_key?: string;
 }
 
 export class SignInDto {

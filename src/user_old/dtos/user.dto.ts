@@ -1,10 +1,10 @@
 import {
+  IsBoolean,
   IsEmail,
   IsOptional,
   IsString,
   Matches,
   MaxLength,
-  MinLength,
 } from 'class-validator';
 
 /* eslint-disable prettier/prettier */
@@ -50,4 +50,22 @@ export class UpdateUserDto {
     @IsString()
     address?: string;
 
+}
+
+export class SelectUserDto {
+  @IsOptional()
+  @IsBoolean()
+  username?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  email?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  phone_number?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  address?: boolean;
 }
