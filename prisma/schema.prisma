@@ -17,7 +17,8 @@ model User {
   updated_at     DateTime  @updatedAt
   address        String
   phone_number   String
-  borrowed_books Book[]
+  scores         Score[]
+  comments       Comment[]
   borrows        Borrows[]
 }
 
@@ -25,68 +26,74 @@ model Book {
   id           String     @id @default(uuid())
   title        String
   description  String
-  total_score  Int
+  total_score  Int        @default(0)
   pages        Int
   published_at DateTime
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
-  author       String
-  user_id      String
-  user         User       @relation(fields: [user_id], references: [id])
   borrowed     Borrows?
-  comments     Comments[]
-  genres       Genres[]
-  cover_pic    Image?
+  comments     Comment[]
+  genres       Genre[]
+  cover_pic    String?
   scores       Score[]
+  author_id    String
+  author       Author     @relation(fields: [author_id], references: [id])
 }
 
-model Image {
-  id         String   @id @default(uuid())
-  url        String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  book_id    String   @unique
-  book       Book     @relation(fields: [book_id], references: [id])
+model Borrows {
+  id             String   @id @default(uuid())
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  deadline       DateTime @default(dbgenerated("NOW() + interval '7 DAYS'"))
+  expires        Boolean  @default(false)
+  returned       Boolean  @default(false)
+  date_of_borrow DateTime
+  book_id        String   @unique
+  book           Book     @relation(fields: [book_id], references: [id])
+  user_id        String
+  user           User     @relation(fields: [user_id], references: [id])
+}
+
+
+model Author {
+  id           String     @id @default(uuid())
+  name         String
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  books        Book[]
 }
 
 model Score {
-  id         String   @id @default(uuid())
+  id         String   @default(uuid())
   score      Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   book_id    String
   book       Book     @relation(fields: [book_id], references: [id])
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id])
+  @@id([id, book_id, user_id])
 }
 
-model Comments {
-  id         String   @id @default(uuid())
+model Comment {
+  id         String   @default(uuid())
   comment    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   book_id    String
   book       Book     @relation(fields: [book_id], references: [id])
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id])
+  @@id([id, book_id, user_id])
 }
 
-model Genres {
+model Genre {
   id         String   @id @default(uuid())
   genre      String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   book_id    String
   book       Book     @relation(fields: [book_id], references: [id])
-}
-
-model Borrows {
-  id             String   @id @default(uuid())
-  book_id        String   @unique
-  user_id        String
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-  deadline       Int      @default(7)
-  expires        Boolean  @default(false)
-  date_of_borrow DateTime
-  book           Book     @relation(fields: [book_id], references: [id])
-  user           User     @relation(fields: [user_id], references: [id])
 }
 
 enum UserType {

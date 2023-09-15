@@ -1,20 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserResponseDto } from './dtos/user.dto';
-import { UpdateUser, selectUserData } from './interfaces/usert.interface';
+import { UpdateUser, selectUserData } from './interfaces/user.interface';
 
+export const userData: selectUserData = {
+  username: true,
+  email: true,
+  phone_number: true,
+  address: true,
+};
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getUser(id: string) {
-    const data: selectUserData = {
-      username: true,
-      email: true,
-      phone_number: true,
-      address: true,
-    };
-    const user = await this.userExistence(id, data);
+    const user = await this.userExistence(id, userData);
 
     if (!user) {
       throw new NotFoundException('User not found !');
@@ -35,12 +35,7 @@ export class UserService {
         id,
       },
       data,
-      select: {
-        username: true,
-        email: true,
-        address: true,
-        phone_number: true,
-      },
+      select: userData,
     });
 
     return new UserResponseDto(updatedUser);

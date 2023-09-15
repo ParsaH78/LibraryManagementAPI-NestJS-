@@ -1,11 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { UserType } from '@prisma/client';
 import {
   IsNotEmpty,
   IsString,
   IsEmail,
   IsOptional,
-  IsEnum,
   Matches,
   MinLength,
   MaxLength
@@ -58,13 +56,3 @@ export class SignInDto {
   })
   password: string;
 }
-
-export class GenerateProductKeyDto {
-  @IsEmail()
-  email: string;
-
-  @IsEnum(UserType)
-  userType: UserType;
-}
-
-
