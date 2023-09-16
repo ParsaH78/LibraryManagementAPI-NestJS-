@@ -1,4 +1,9 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,17 +13,17 @@ export class AuthorService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createAuthorDto: CreateAuthorDto) {
-    const author = await this.findOneByName(createAuthorDto.name);
-
-    if (author) {
-      throw new ConflictException('Author already exists !');
+    try {
+      const new_author = await this.prismaService.author.create({
+        data: createAuthorDto,
+      });
+      return new_author;
+    } catch (error) {
+      throw new HttpException(
+        `Error in creating author : ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
-
-    const new_author = await this.prismaService.author.create({
-      data: createAuthorDto,
-    });
-
-    return new_author;
   }
 
   async findAll() {
@@ -45,7 +50,7 @@ export class AuthorService {
     const author = await this.findOne(id);
 
     if (!author) {
-      throw new ConflictException('Author already exists !');
+      throw new ConflictException("Author doesn't exists !");
     }
 
     const new_author = await this.prismaService.author.update({

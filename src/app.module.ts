@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './resources/auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { BookModule } from './book/book.module';
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { UserInterceptor } from './interceptors/user.interceptor';
-import { AuthorModule } from './author/author.module';
-import { ScoreModule } from './score/score.module';
-import { CommentModule } from './comment/comment.module';
-import { GenreModule } from './genre/genre.module';
-import { BorrowsModule } from './borrows/borrows.module';
-import { UserModule } from './user/user.module';
+import { AuthorModule } from './resources/author/author.module';
+import { ScoreModule } from './resources/score/score.module';
+import { CommentModule } from './resources/comment/comment.module';
+import { GenreModule } from './resources/genre/genre.module';
+import { BorrowsModule } from './resources/borrows/borrows.module';
+import { UserModule } from './resources/user/user.module';
+import { BookModule } from './resources/book/book.module';
 
 @Module({
   imports: [

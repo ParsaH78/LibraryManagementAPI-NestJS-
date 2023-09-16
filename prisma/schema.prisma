@@ -64,7 +64,7 @@ model Author {
 }
 
 model Score {
-  id         String   @default(uuid())
+  id         String   @id @default(uuid())
   score      Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -72,11 +72,10 @@ model Score {
   book       Book     @relation(fields: [book_id], references: [id])
   user_id    String
   user       User     @relation(fields: [user_id], references: [id])
-  @@id([id, book_id, user_id])
 }
 
 model Comment {
-  id         String   @default(uuid())
+  id         String   @id @default(uuid())
   comment    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -84,7 +83,6 @@ model Comment {
   book       Book     @relation(fields: [book_id], references: [id])
   user_id    String
   user       User     @relation(fields: [user_id], references: [id])
-  @@id([id, book_id, user_id])
 }
 
 model Genre {

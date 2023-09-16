@@ -4,7 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 interface JWTPayload {
-  name: string;
+  username: string;
   id: string;
   iat: number;
   exp: number;
@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
       try {
         const payload = (await jwt.verify(
           token,
-          process.env.JSON_TOKEN_KEY,
+          process.env.JWT_SECRET,
         )) as JWTPayload;
 
         const user = await this.prismaService.user.findUnique({
