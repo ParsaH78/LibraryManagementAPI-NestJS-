@@ -30,4 +30,7 @@ export class CreateBookDto {
   @IsString()
   @IsOptional()
   cover_pic?: string;
+  @IsString()
+  @IsOptional()
+  genre?: string;
 }

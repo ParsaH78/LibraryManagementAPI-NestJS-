@@ -15,5 +15,6 @@ import { AuthorModule } from '../author/author.module';
       useClass: ClassSerializerInterceptor,
     },
   ],
+  exports: [BookService],
 })
 export class BookModule {}

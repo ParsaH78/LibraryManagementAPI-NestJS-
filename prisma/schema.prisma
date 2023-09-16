@@ -87,11 +87,11 @@ model Comment {
 
 model Genre {
   id         String   @id @default(uuid())
-  genre      String
+  genre      String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  book_id    String
-  book       Book     @relation(fields: [book_id], references: [id])
+  book_id    String?
+  book       Book?     @relation(fields: [book_id], references: [id])
 }
 
 enum UserType {
