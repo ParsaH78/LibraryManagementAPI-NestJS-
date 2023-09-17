@@ -7,7 +7,9 @@ export interface UserInfo {
   exp: number;
 }
 
-export const User = createParamDecorator((data, context: ExecutionContext) => {
-  const request = context.switchToHttp().getRequest();
-  return request.user;
-});
+export const User = createParamDecorator(
+  (_, context: ExecutionContext): UserInfo => {
+    const request = context.switchToHttp().getRequest();
+    return request.user;
+  },
+);

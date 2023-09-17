@@ -6,6 +6,9 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
+  UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -26,18 +29,43 @@ export class CommentController {
     return this.commentService.findAll();
   }
 
+  @Get('/user/:id')
+  findUserComments(@Param('id', ParseUUIDPipe) id: string) {
+    return this.commentService.findUsersComments(id);
+  }
+
   @Get('/:id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.commentService.findOne(id);
   }
 
   @Patch('/:id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateCommentDto: UpdateCommentDto,
+    @User() user: UserInfo,
+  ) {
+    const comment = await this.commentService.findOne(id);
+
+    if (!comment) {
+      throw new NotFoundException('There is no comment with this ID');
+    }
+
+    if (user.id !== comment.user_id) {
+      throw new UnauthorizedException("You can't change other's comments");
+    }
+
     return this.commentService.update(id, updateCommentDto);
   }
 
   @Delete('/:id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const comment = await this.findOne(id);
+
+    if (!comment) {
+      throw new NotFoundException('There is no comment with this ID');
+    }
+
     return this.commentService.remove(id);
   }
 }
