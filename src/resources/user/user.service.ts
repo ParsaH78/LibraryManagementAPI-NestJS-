@@ -8,6 +8,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserType } from '@prisma/client';
 import { ResponseUserDto } from './dto/response-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -23,14 +24,29 @@ export class UserService {
       throw new ConflictException('User already exists !');
     }
 
+    const salt: string = await bcrypt.genSalt();
+    createUserDto.password = await bcrypt.hash(createUserDto.password, salt);
+
     const new_user = await this.prismaService.user.create({
       data: {
         ...createUserDto,
         user_type: UserType.MEMBER,
       },
+      include: {
+        scores: {
+          select: {
+            score: true,
+          },
+        },
+        comments: {
+          select: {
+            comment: true,
+          },
+        },
+      },
     });
 
-    return new_user;
+    return new ResponseUserDto(new_user);
   }
 
   async findAll() {
@@ -75,6 +91,11 @@ export class UserService {
 
     if (!isUser) {
       throw new NotFoundException('There is no user with this ID');
+    }
+
+    if (updateUserDto?.password) {
+      const salt: string = await bcrypt.genSalt();
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
     }
 
     const updated_user = await this.prismaService.user.update({
