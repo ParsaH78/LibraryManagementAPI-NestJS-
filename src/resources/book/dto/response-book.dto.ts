@@ -1,9 +1,12 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { IsString, ValidateNested } from 'class-validator';
+import { ValidateNested } from 'class-validator';
 
 class AuthorDto {
-  @IsString()
   name: string;
+}
+
+export class GenreDto {
+  genre: string;
 }
 
 export class ResponseBookDto {
@@ -17,12 +20,24 @@ export class ResponseBookDto {
 
   @Exclude()
   @ValidateNested()
-  @Type(() => Image)
+  @Type(() => AuthorDto)
   author: AuthorDto;
 
   @Expose({ name: 'authorName' })
   authorName() {
     return this.author.name;
+  }
+
+  @Exclude()
+  @ValidateNested()
+  @Type(() => GenreDto)
+  genres: GenreDto[];
+
+  @Expose({ name: 'genreNames' })
+  genreName() {
+    return this.genres.map((g) => {
+      return g.genre;
+    });
   }
 
   total_score: number;

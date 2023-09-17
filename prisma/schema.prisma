@@ -24,7 +24,7 @@ model User {
 
 model Book {
   id           String     @id @default(uuid())
-  title        String
+  title        String     @unique
   description  String
   total_score  Int        @default(0)
   pages        Int
@@ -37,7 +37,15 @@ model Book {
   cover_pic    String?
   scores       Score[]
   author_id    String
-  author       Author     @relation(fields: [author_id], references: [id])
+  author       Author     @relation(fields: [author_id], references: [id], onDelete: Cascade)
+}
+
+model Genre {
+  id         String   @id @default(uuid())
+  genre      String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  books      Book[]
 }
 
 model Borrows {
@@ -49,9 +57,9 @@ model Borrows {
   returned       Boolean  @default(false)
   date_of_borrow DateTime
   book_id        String   @unique
-  book           Book     @relation(fields: [book_id], references: [id])
+  book           Book     @relation(fields: [book_id], references: [id], onDelete: NoAction)
   user_id        String
-  user           User     @relation(fields: [user_id], references: [id])
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 
@@ -69,9 +77,9 @@ model Score {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   book_id    String
-  book       Book     @relation(fields: [book_id], references: [id])
+  book       Book     @relation(fields: [book_id], references: [id], onDelete: Cascade)
   user_id    String
-  user       User     @relation(fields: [user_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -80,18 +88,9 @@ model Comment {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   book_id    String
-  book       Book     @relation(fields: [book_id], references: [id])
+  book       Book     @relation(fields: [book_id], references: [id], onDelete: Cascade)
   user_id    String
-  user       User     @relation(fields: [user_id], references: [id])
-}
-
-model Genre {
-  id         String   @id @default(uuid())
-  genre      String   @unique
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  book_id    String?
-  book       Book?     @relation(fields: [book_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 enum UserType {

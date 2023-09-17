@@ -3,10 +3,10 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateGenreDto } from '../dto/create-genre.dto';
-import { UpdateGenreDto } from '../dto/update-genre.dto';
+import { CreateGenreDto } from './dto/create-genre.dto';
+import { UpdateGenreDto } from './dto/update-genre.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseGenreDto } from '../dto/response-genre.dto';
+import { ResponseGenreDto } from './dto/response-genre.dto';
 @Injectable()
 export class GenreService {
   constructor(private readonly prismaService: PrismaService) {}

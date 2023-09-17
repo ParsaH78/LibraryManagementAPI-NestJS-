@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateBookDto {
@@ -33,4 +34,16 @@ export class CreateBookDto {
   @IsString()
   @IsOptional()
   genre?: string;
+}
+
+export class AddGenreDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsUUID()
+  genre_id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsUUID()
+  book_id: string;
 }

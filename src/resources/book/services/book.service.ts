@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
+import { CreateBookDto } from '../dto/create-book.dto';
+import { UpdateBookDto } from '../dto/update-book.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthorService } from '../author/author.service';
-import { ResponseBookDto } from './dto/response-book.dto';
+import { AuthorService } from '../../author/author.service';
+import { ResponseBookDto } from '../dto/response-book.dto';
 
 @Injectable()
 export class BookService {
@@ -68,6 +68,11 @@ export class BookService {
         author: {
           select: {
             name: true,
+          },
+        },
+        genres: {
+          select: {
+            genre: true,
           },
         },
       },
