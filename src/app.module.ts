@@ -11,6 +11,7 @@ import { GenreModule } from './resources/genre/genre.module';
 import { BorrowsModule } from './resources/borrows/borrows.module';
 import { UserModule } from './resources/user/user.module';
 import { BookModule } from './resources/book/book.module';
+import { BorrowHistoryModule } from './resources/borrow_history/borrow_history.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { BookModule } from './resources/book/book.module';
     CommentModule,
     GenreModule,
     BorrowsModule,
+    BorrowHistoryModule,
   ],
   controllers: [],
   providers: [
