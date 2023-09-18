@@ -3,9 +3,10 @@ import { BorrowsService } from './borrows.service';
 import { BorrowsController } from './borrows.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { BookModule } from '../book/book.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, BookModule],
   controllers: [BorrowsController],
   providers: [
     BorrowsService,

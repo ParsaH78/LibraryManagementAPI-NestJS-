@@ -75,6 +75,12 @@ export class BookService {
             genre: true,
           },
         },
+        // borrowed: {
+        //   select: {
+        //     returned: true,
+        //     id: true,
+        //   },
+        // },
       },
     });
     return new ResponseBookDto(book);

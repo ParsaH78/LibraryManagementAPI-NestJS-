@@ -20,10 +20,19 @@ export class BorrowsController {
   constructor(private readonly borrowsService: BorrowsService) {}
 
   @Post()
-  create(@Body() createBorrowDto: CreateBorrowDto, @User() user: UserInfo) {
+  async create(
+    @Body() createBorrowDto: CreateBorrowDto,
+    @User() user: UserInfo,
+  ) {
     if (!user) {
       throw new UnauthorizedException('You need to login first');
     }
+    // const book = await this.bookService.findOne(createBorrowDto.book_id);
+    // if (!book.borrowed.returned) {
+    //   throw new ConflictException(
+    //     'This book has been borrowed by someone else',
+    //   );
+    // }
     return this.borrowsService.create(createBorrowDto, user.id);
   }
 
@@ -55,10 +64,12 @@ export class BorrowsController {
 
     if (isBorrow.user_id !== user.id) {
       throw new UnauthorizedException(
-        "You are not allowed to change other's scores",
+        "You are not allowed to change other's borrows",
       );
     }
-    return this.borrowsService.update(id, updateBorrowDto);
+    const updated = await this.borrowsService.update(id, updateBorrowDto);
+
+    return updated;
   }
 
   @Delete('/:id')

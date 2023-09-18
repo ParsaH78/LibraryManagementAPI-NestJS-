@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { BookService } from '../services/book.service';
 import { CreateBookDto } from '../dto/create-book.dto';
@@ -28,19 +29,22 @@ export class BookController {
   }
 
   @Get('/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.bookService.findOne(id);
   }
 
   @Roles('ADMIN')
   @Patch('/:id')
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateBookDto: UpdateBookDto,
+  ) {
     return this.bookService.update(id, updateBookDto);
   }
 
   @Roles('ADMIN')
   @Delete('/:id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.bookService.remove(id);
   }
 }

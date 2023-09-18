@@ -20,20 +20,19 @@ model User {
   scores         Score[]
   comments       Comment[]
   borrows        Borrows[]
-  borrow_history Borrow_history[]
 }
 
-model Borrow_history {
-  id             String     @id @default(uuid())
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
-  user_id        String
-  user           User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  book_id        String     @unique
-  book           Book       @relation(fields: [book_id], references: [id], onDelete: NoAction)
-  borrow_id      String     @unique
-  borrow         Borrows    @relation(fields: [borrow_id], references: [id], onDelete: NoAction)
-}
+// model Borrow_history {
+//   id             String     @id @default(uuid())
+//   created_at     DateTime   @default(now())
+//   updated_at     DateTime   @updatedAt
+//   user_id        String
+//   user           User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+//   book_id        String     @unique
+//   book           Book       @relation(fields: [book_id], references: [id], onDelete: NoAction)
+//   borrow_id      String     @unique
+//   borrow         Borrows    @relation(fields: [borrow_id], references: [id])
+// }
 
 model Borrows {
   id             String   @id @default(uuid())
@@ -47,7 +46,6 @@ model Borrows {
   book           Book     @relation(fields: [book_id], references: [id], onDelete: NoAction)
   user_id        String
   user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  borrow_history Borrow_history?
 }
 
 
@@ -60,14 +58,13 @@ model Book {
   published_at   DateTime
   created_at     DateTime   @default(now())
   updated_at     DateTime   @updatedAt
-  borrowed       Borrows?
+  borrowed       Borrows[]
   comments       Comment[]
   genres         Genre[]
   cover_pic      String?
   scores         Score[]
   author_id      String
   author         Author     @relation(fields: [author_id], references: [id], onDelete: Cascade)
-  borrow_history Borrow_history?
 }
 
 model Genre {

@@ -12,7 +12,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { AddGenreDto } from '../dto/create-book.dto';
 
 @Roles('ADMIN')
-@Controller('book/genre')
+@Controller('/addgenre')
 export class BookGenreController {
   constructor(private readonly bookGenreService: BookGenreService) {}
 
