@@ -39,7 +39,7 @@ export class AuthService {
         password: hashedPassword,
         phone_number,
         address,
-        user_type: UserType.MEMBER,
+        user_type: UserType.ADMIN,
       },
     });
 

@@ -9,10 +9,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserType } from '@prisma/client';
 import { ResponseUserDto } from './dto/response-user.dto';
 import * as bcrypt from 'bcrypt';
+import { BorrowsService } from '../borrows/borrows.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly borrowService: BorrowsService,
+  ) {}
   async create(createUserDto: CreateUserDto) {
     const isUser = await this.prismaService.user.findUnique({
       where: {
@@ -140,5 +144,28 @@ export class UserService {
     });
 
     return `User ${id} has been removed`;
+  }
+
+  async getBorrowHistory(user_id: string) {
+    const history = await this.prismaService.borrows.findMany({
+      where: {
+        user_id,
+        returned: true,
+      },
+      include: {
+        book: {
+          select: {
+            title: true,
+            author: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return history;
   }
 }

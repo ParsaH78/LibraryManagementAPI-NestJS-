@@ -9,10 +9,6 @@ export class GenreDto {
   genre: string;
 }
 
-// class BorrowedDto {
-//   returned: boolean;
-// }
-
 export class ResponseBookDto {
   title: string;
 
@@ -43,16 +39,6 @@ export class ResponseBookDto {
       return g.genre;
     });
   }
-
-  // @Exclude()
-  // @ValidateNested()
-  // @Type(() => BorrowedDto)
-  // borrowed?: BorrowedDto;
-
-  // @Expose({ name: 'isReturned' })
-  // isReturned() {
-  //   return this.borrowed.returned;
-  // }
 
   total_score: number;
 

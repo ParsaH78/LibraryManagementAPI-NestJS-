@@ -11,6 +11,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/decorators/roles.decorator';
+import { User, UserInfo } from 'src/decorators/user.decorator';
 
 @Roles('ADMIN')
 @Controller('user')
@@ -40,5 +41,10 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+
+  @Get('/history')
+  getBorrowHistory(@User() user: UserInfo) {
+    return this.userService.getBorrowHistory(user.id);
   }
 }

@@ -42,6 +42,13 @@ export class GenreService {
     });
   }
 
+  async findOneByName(genre: string): Promise<ResponseGenreDto> {
+    return await this.prismaService.genre.findUnique({
+      where: { genre },
+      select: { id: true, genre: true },
+    });
+  }
+
   async update(
     id: string,
     updateGenreDto: UpdateGenreDto,

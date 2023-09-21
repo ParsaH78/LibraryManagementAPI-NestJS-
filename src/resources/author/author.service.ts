@@ -13,6 +13,7 @@ export class AuthorService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createAuthorDto: CreateAuthorDto) {
+    createAuthorDto.name = createAuthorDto.name.toLowerCase();
     try {
       const new_author = await this.prismaService.author.create({
         data: createAuthorDto,
@@ -51,6 +52,10 @@ export class AuthorService {
 
     if (!author) {
       throw new ConflictException("Author doesn't exists !");
+    }
+
+    if (updateAuthorDto?.name) {
+      updateAuthorDto.name = updateAuthorDto.name.toLowerCase();
     }
 
     const new_author = await this.prismaService.author.update({

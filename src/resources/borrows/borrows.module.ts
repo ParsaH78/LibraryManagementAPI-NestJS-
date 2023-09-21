@@ -15,5 +15,6 @@ import { BookModule } from '../book/book.module';
       useClass: ClassSerializerInterceptor,
     },
   ],
+  exports: [BorrowsService],
 })
 export class BorrowsModule {}

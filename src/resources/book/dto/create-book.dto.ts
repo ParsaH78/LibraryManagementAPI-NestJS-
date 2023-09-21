@@ -12,28 +12,34 @@ export class CreateBookDto {
   @IsString()
   @IsNotEmpty()
   title: string;
+
   @IsString()
   @IsNotEmpty()
   description: string;
+
   @IsNumber()
   @IsNotEmpty()
   pages: number;
+
   @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
   published_at: Date;
+
   @IsString()
   @IsNotEmpty()
   author_name: string;
+
   @IsNumber()
   @IsOptional()
   total_score?: number;
+
   @IsString()
   @IsOptional()
   cover_pic?: string;
-  @IsString()
+
   @IsOptional()
-  genre?: string;
+  genres?: string[];
 }
 
 export class AddGenreDto {
