@@ -9,8 +9,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { AuthorService } from './author.service';
-import { CreateAuthorDto } from './dto/create-author.dto';
-import { UpdateAuthorDto } from './dto/update-author.dto';
+import { CreateAuthorDto, UpdateAuthorDto } from './dto/index';
 import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('author')

@@ -2,6 +2,8 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,12 +19,8 @@ export class UserService {
     private readonly prismaService: PrismaService,
     private readonly borrowService: BorrowsService,
   ) {}
-  async create(createUserDto: CreateUserDto) {
-    const isUser = await this.prismaService.user.findUnique({
-      where: {
-        email: createUserDto.email,
-      },
-    });
+  async create(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
+    const isUser = await this.findOneByEmail(createUserDto.email);
 
     if (isUser) {
       throw new ConflictException('User already exists !');
@@ -31,66 +29,104 @@ export class UserService {
     const salt: string = await bcrypt.genSalt();
     createUserDto.password = await bcrypt.hash(createUserDto.password, salt);
 
-    const new_user = await this.prismaService.user.create({
-      data: {
-        ...createUserDto,
-        user_type: UserType.MEMBER,
-      },
-      include: {
-        scores: {
-          select: {
-            score: true,
-          },
+    try {
+      const new_user = await this.prismaService.user.create({
+        data: {
+          ...createUserDto,
+          user_type: UserType.MEMBER,
         },
-        comments: {
-          select: {
-            comment: true,
-          },
-        },
-      },
-    });
+      });
 
-    return new ResponseUserDto(new_user);
+      return new ResponseUserDto(new_user);
+    } catch (error) {
+      throw new HttpException(
+        `Error in creating user : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  async findAll() {
-    const users = await this.prismaService.user.findMany({
-      include: {
-        scores: {
-          select: {
-            score: true,
+  async findAll(): Promise<ResponseUserDto[]> {
+    try {
+      const users = await this.prismaService.user.findMany({
+        include: {
+          scores: {
+            select: {
+              score: true,
+            },
+          },
+          comments: {
+            select: {
+              comment: true,
+            },
           },
         },
-        comments: {
-          select: {
-            comment: true,
-          },
-        },
-      },
-    });
-    return users.map((user) => new ResponseUserDto(user));
+      });
+      return users.map((user) => new ResponseUserDto(user));
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting all users : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  async findOne(id: string) {
-    const user = await this.prismaService.user.findUnique({
-      where: { id },
-      include: {
-        scores: {
-          select: {
-            score: true,
+  async findOne(id: string): Promise<ResponseUserDto> {
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: { id },
+        include: {
+          scores: {
+            select: {
+              score: true,
+            },
+          },
+          comments: {
+            select: {
+              comment: true,
+            },
           },
         },
-        comments: {
-          select: {
-            comment: true,
-          },
-        },
-      },
-    });
-    return new ResponseUserDto(user);
+      });
+      return new ResponseUserDto(user);
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting a user by ID : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async findOneByEmail(email: string): Promise<ResponseUserDto> {
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: { email },
+        include: {
+          scores: {
+            select: {
+              score: true,
+            },
+          },
+          comments: {
+            select: {
+              comment: true,
+            },
+          },
+        },
+      });
+      return new ResponseUserDto(user);
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting a user by Email : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<ResponseUserDto> {
     const isUser = this.findOne(id);
 
     if (!isUser) {
@@ -102,48 +138,38 @@ export class UserService {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
     }
 
-    const updated_user = await this.prismaService.user.update({
-      where: {
-        id,
-      },
-      data: updateUserDto,
-      include: {
-        scores: {
-          select: {
-            score: true,
-          },
+    try {
+      const updated_user = await this.prismaService.user.update({
+        where: {
+          id,
         },
-        comments: {
-          select: {
-            comment: true,
-          },
-        },
-      },
-    });
+        data: updateUserDto,
+      });
 
-    return new ResponseUserDto(updated_user);
+      return new ResponseUserDto(updated_user);
+    } catch (error) {
+      throw new HttpException(
+        `Error in updating user : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async remove(id: string) {
-    await this.prismaService.user.delete({
-      where: {
-        id,
-      },
-      include: {
-        scores: {
-          select: {
-            score: true,
-          },
+    try {
+      await this.prismaService.user.delete({
+        where: {
+          id,
         },
-        comments: {
-          select: {
-            comment: true,
-          },
-        },
-      },
-    });
+      });
 
-    return `User ${id} has been removed`;
+      return { message: `User ${id} has been removed` };
+    } catch (error) {
+      throw new HttpException(
+        `Error in removing user : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async getBorrowHistory(user_id: string) {

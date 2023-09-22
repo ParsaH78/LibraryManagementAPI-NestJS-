@@ -12,6 +12,8 @@ import { AuthorService } from '../author/author.service';
 import { ResponseBookDto } from './dto/response-book.dto';
 import { GenreService } from 'src/resources/genre/genre.service';
 import { ResponseGenreDto } from 'src/resources/genre/dto/response-genre.dto';
+import { ErrorInterface } from './interfaces/error.interface';
+import { ResponseAuthorDto } from '../author/dto';
 
 @Injectable()
 export class BookService {
@@ -20,154 +22,199 @@ export class BookService {
     private readonly authorService: AuthorService,
     private readonly genreService: GenreService,
   ) {}
-  async create(createBookDto: CreateBookDto, genres_data: ResponseGenreDto[]) {
-    const { author, error } = await this.isAuthorValid(
-      createBookDto.author_name,
-    );
-
-    if (error) throw error;
-
+  async create(
+    createBookDto: CreateBookDto,
+    genres_data: ResponseGenreDto[],
+    author: ResponseAuthorDto,
+  ): Promise<ResponseBookDto> {
     createBookDto.title = createBookDto.title.toLowerCase();
     const { author_name, genres, ...data } = createBookDto;
 
-    const book = await this.prismaService.book.create({
-      data: {
-        ...data,
-        genres: {
-          connect: genres_data,
+    try {
+      const book = await this.prismaService.book.create({
+        data: {
+          ...data,
+          genres: {
+            connect: genres_data,
+          },
+          author_id: author.id,
         },
-        author_id: author.id,
-      },
-    });
+      });
 
-    return new ResponseBookDto(book);
+      return new ResponseBookDto(book);
+    } catch (error) {
+      throw new HttpException(
+        `Error in creating book : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findAll(): Promise<ResponseBookDto[]> {
-    const books = await this.prismaService.book.findMany({
-      include: {
-        author: {
-          select: {
-            name: true,
+    try {
+      const books = await this.prismaService.book.findMany({
+        include: {
+          author: {
+            select: {
+              name: true,
+            },
+          },
+          genres: {
+            select: {
+              genre: true,
+              id: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return books.map((book) => {
-      return new ResponseBookDto(book);
-    });
+      return books.map((book) => {
+        return new ResponseBookDto(book);
+      });
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting all books : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findOne(id: string): Promise<ResponseBookDto> {
-    const book = await this.prismaService.book.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        author: {
-          select: {
-            name: true,
+    try {
+      const book = await this.prismaService.book.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          author: {
+            select: {
+              name: true,
+            },
+          },
+          genres: {
+            select: {
+              genre: true,
+              id: true,
+            },
           },
         },
-        genres: {
-          select: {
-            genre: true,
-          },
-        },
-      },
-    });
-    return new ResponseBookDto(book);
+      });
+
+      return new ResponseBookDto(book);
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting book by ID : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findOneByName(title: string): Promise<ResponseBookDto> {
-    const book = await this.prismaService.book.findUnique({
-      where: {
-        title,
-      },
-      include: {
-        author: {
-          select: {
-            name: true,
+    try {
+      const book = await this.prismaService.book.findUnique({
+        where: {
+          title,
+        },
+        include: {
+          author: {
+            select: {
+              name: true,
+            },
+          },
+          genres: {
+            select: {
+              id: true,
+              genre: true,
+            },
           },
         },
-        genres: {
-          select: {
-            genre: true,
-          },
-        },
-      },
-    });
-    return new ResponseBookDto(book);
+      });
+      return new ResponseBookDto(book);
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting book by Title : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async update(
     id: string,
     updateBookDto: UpdateBookDto,
+    genres_data: ResponseGenreDto[],
+    new_author: ResponseAuthorDto,
   ): Promise<ResponseBookDto> {
-    const isBook = await this.findOne(id);
+    if ('title' in updateBookDto)
+      updateBookDto.title = updateBookDto.title.toLowerCase();
 
-    if (!isBook) {
+    const { author_name, genres, ...data } = updateBookDto;
+
+    try {
+      const updated_book = await this.prismaService.book.update({
+        where: {
+          id,
+        },
+        data: {
+          ...data,
+          genres: {
+            connect: genres_data,
+          },
+          author_id: new_author.id,
+        },
+      });
+
+      return new ResponseBookDto(updated_book);
+    } catch (error) {
       throw new HttpException(
-        'There is No Book with this ID',
-        HttpStatus.NOT_FOUND,
+        `Error in updating book : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
       );
     }
-
-    return;
-
-    // const updated_book = await this.prismaService.book.update({
-    //   where: {
-    //     id,
-    //   },
-    //   data: updateBookDto,
-    //   include: {
-    //     author: {
-    //       select: {
-    //         name: true,
-    //       },
-    //     },
-    //   },
-    // });
-
-    // return new ResponseBookDto(updated_book);
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    const book = await this.prismaService.book.delete({
-      where: { id },
-    });
-    return { message: `Book with name ${book.title} has been removed !` };
+    try {
+      const book = await this.prismaService.book.delete({
+        where: { id },
+      });
+      return { message: `Book with name ${book.title} has been removed !` };
+    } catch (error) {
+      throw new HttpException(
+        `Error in removing book : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  async isAuthorValid(author_name: string) {
-    let error: HttpException = null;
+  async isAuthorValid(
+    author_name: string,
+  ): Promise<{ author: ResponseAuthorDto; error: ErrorInterface }> {
+    let error: ErrorInterface = null;
     const author = await this.authorService.findOneByName(
       author_name.toLowerCase(),
     );
 
     if (!author) {
-      error = new HttpException(
-        'There is no author with this name',
-        HttpStatus.NOT_FOUND,
-      );
+      error = { message: 'There is no author with this name', code: 404 };
     }
 
     return { author, error };
   }
 
-  async genreValidation(
-    genre: string,
-  ): Promise<{ isGenre: ResponseGenreDto; error: HttpException }> {
-    let error: HttpException = null;
+  async genreValidation(genre: string): Promise<{
+    isGenre: ResponseGenreDto;
+    error: ErrorInterface;
+  }> {
+    let error: ErrorInterface = null;
 
     genre = genre.toLowerCase();
 
     const isGenre = await this.genreService.findOneByName(genre);
     if (!isGenre) {
-      error = new NotFoundException({
-        message: `Genre ${isGenre.genre} does not exist`,
-      });
+      error = {
+        message: `Genre ${genre} does not exist`,
+        code: 404,
+      };
     }
 
     return { isGenre, error };

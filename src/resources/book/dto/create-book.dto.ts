@@ -1,5 +1,7 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsDate,
   IsNotEmpty,
   IsNumber,
@@ -38,8 +40,10 @@ export class CreateBookDto {
   @IsOptional()
   cover_pic?: string;
 
-  @IsOptional()
-  genres?: string[];
+  @ArrayNotEmpty()
+  @IsArray()
+  @IsString({ each: true })
+  genres: string[];
 }
 
 export class AddGenreDto {

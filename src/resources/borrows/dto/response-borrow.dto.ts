@@ -30,7 +30,7 @@ export class ResponseBorrowDto {
   @Exclude()
   @ValidateNested()
   @Type(() => BookBorrowDto)
-  book: BookBorrowDto;
+  book?: BookBorrowDto;
 
   @Expose({ name: 'bookTitle' })
   bookTitle() {
@@ -40,7 +40,7 @@ export class ResponseBorrowDto {
   @Exclude()
   @ValidateNested()
   @Type(() => UserBorrowDto)
-  user: UserBorrowDto;
+  user?: UserBorrowDto;
 
   @Expose({ name: 'username' })
   username() {

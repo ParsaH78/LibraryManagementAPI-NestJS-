@@ -2,6 +2,8 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
@@ -18,35 +20,68 @@ export class GenreService {
       throw new ConflictException('This genre has already been added !');
     }
 
-    const genre: ResponseGenreDto = await this.prismaService.genre.create({
-      data: createGenreDto,
-      select: {
-        id: true,
-        genre: true,
-      },
-    });
+    try {
+      const genre: ResponseGenreDto = await this.prismaService.genre.create({
+        data: createGenreDto,
+        select: {
+          id: true,
+          genre: true,
+        },
+      });
 
-    return new ResponseGenreDto(genre);
+      return new ResponseGenreDto(genre);
+    } catch (error) {
+      throw new HttpException(
+        `Error in adding a genre : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findAll(): Promise<ResponseGenreDto[]> {
-    return await this.prismaService.genre.findMany({
-      select: { id: true, genre: true },
-    });
+    try {
+      const genres = await this.prismaService.genre.findMany({
+        select: { id: true, genre: true },
+      });
+
+      return genres.map((genre) => new ResponseGenreDto(genre));
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting all genres : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findOne(id: string): Promise<ResponseGenreDto> {
-    return await this.prismaService.genre.findUnique({
-      where: { id },
-      select: { id: true, genre: true },
-    });
+    try {
+      const genre = await this.prismaService.genre.findUnique({
+        where: { id },
+        select: { id: true, genre: true },
+      });
+      return new ResponseGenreDto(genre);
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting genre by ID: \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  async findOneByName(genre: string): Promise<ResponseGenreDto> {
-    return await this.prismaService.genre.findUnique({
-      where: { genre },
-      select: { id: true, genre: true },
-    });
+  async findOneByName(name: string): Promise<ResponseGenreDto> {
+    try {
+      const genre = await this.prismaService.genre.findUnique({
+        where: { genre: name },
+        select: { id: true, genre: true },
+      });
+
+      return new ResponseGenreDto(genre);
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting genre by Name : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async update(
@@ -59,32 +94,37 @@ export class GenreService {
       throw new NotFoundException('There is no genre with this ID !');
     }
 
-    const updated_genre: ResponseGenreDto =
-      await this.prismaService.genre.update({
+    try {
+      const updated_genre = await this.prismaService.genre.update({
         where: {
           id,
         },
         data: updateGenreDto,
-        select: {
-          id: true,
-          genre: true,
-        },
       });
 
-    return new ResponseGenreDto(updated_genre);
+      return new ResponseGenreDto(updated_genre);
+    } catch (error) {
+      throw new HttpException(
+        `Error in updating a genre : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  async remove(id: string): Promise<string> {
-    const deleted_genre: ResponseGenreDto =
-      await this.prismaService.genre.delete({
+  async remove(id: string): Promise<{ message: string }> {
+    try {
+      const deleted_genre = await this.prismaService.genre.delete({
         where: {
           id,
         },
-        select: {
-          id: true,
-          genre: true,
-        },
       });
-    return `${deleted_genre.genre} Genre has been removed !`;
+
+      return { message: `${deleted_genre.genre} Genre has been removed !` };
+    } catch (error) {
+      throw new HttpException(
+        `Error in removing a genre : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

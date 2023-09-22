@@ -15,5 +15,6 @@ import { BorrowsModule } from '../borrows/borrows.module';
       useClass: ClassSerializerInterceptor,
     },
   ],
+  exports: [UserService],
 })
 export class UserModule {}

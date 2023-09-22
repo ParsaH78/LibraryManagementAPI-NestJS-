@@ -17,18 +17,6 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "Borrow_history" (
-    "id" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-    "user_id" TEXT NOT NULL,
-    "book_id" TEXT NOT NULL,
-    "borrow_id" TEXT NOT NULL,
-
-    CONSTRAINT "Borrow_history_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Borrows" (
     "id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -113,12 +101,6 @@ CREATE TABLE "_BookToGenre" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Borrow_history_book_id_key" ON "Borrow_history"("book_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Borrow_history_borrow_id_key" ON "Borrow_history"("borrow_id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Borrows_book_id_key" ON "Borrows"("book_id");
 
 -- CreateIndex
@@ -135,15 +117,6 @@ CREATE UNIQUE INDEX "_BookToGenre_AB_unique" ON "_BookToGenre"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_BookToGenre_B_index" ON "_BookToGenre"("B");
-
--- AddForeignKey
-ALTER TABLE "Borrow_history" ADD CONSTRAINT "Borrow_history_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Borrow_history" ADD CONSTRAINT "Borrow_history_book_id_fkey" FOREIGN KEY ("book_id") REFERENCES "Book"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Borrow_history" ADD CONSTRAINT "Borrow_history_borrow_id_fkey" FOREIGN KEY ("borrow_id") REFERENCES "Borrows"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Borrows" ADD CONSTRAINT "Borrows_book_id_fkey" FOREIGN KEY ("book_id") REFERENCES "Book"("id") ON DELETE NO ACTION ON UPDATE CASCADE;

@@ -6,10 +6,15 @@ class AuthorDto {
 }
 
 export class GenreDto {
+  id: string;
   genre: string;
 }
 
 export class ResponseBookDto {
+  constructor(partial: Partial<ResponseBookDto>) {
+    Object.assign(this, partial);
+  }
+
   title: string;
 
   description: string;
@@ -21,7 +26,7 @@ export class ResponseBookDto {
   @Exclude()
   @ValidateNested()
   @Type(() => AuthorDto)
-  author: AuthorDto;
+  author?: AuthorDto;
 
   @Expose({ name: 'authorName' })
   authorName() {
@@ -31,7 +36,7 @@ export class ResponseBookDto {
   @Exclude()
   @ValidateNested()
   @Type(() => GenreDto)
-  genres: GenreDto[];
+  genres?: GenreDto[];
 
   @Expose({ name: 'genreNames' })
   genreName() {
@@ -55,8 +60,4 @@ export class ResponseBookDto {
 
   @Exclude()
   author_id: string;
-
-  constructor(partial: Partial<ResponseBookDto>) {
-    Object.assign(this, partial);
-  }
 }
