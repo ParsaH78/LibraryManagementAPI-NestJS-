@@ -26,7 +26,7 @@ export class BookService {
     createBookDto: CreateBookDto,
     genres_data: ResponseGenreDto[],
     author: ResponseAuthorDto,
-  ): Promise<ResponseBookDto> {
+  ) {
     createBookDto.title = createBookDto.title.toLowerCase();
     const { author_name, genres, ...data } = createBookDto;
 
@@ -41,7 +41,7 @@ export class BookService {
         },
       });
 
-      return new ResponseBookDto(book);
+      return book;
     } catch (error) {
       throw new HttpException(
         `Error in creating book : \n ${error}`,
@@ -143,7 +143,7 @@ export class BookService {
     updateBookDto: UpdateBookDto,
     genres_data: ResponseGenreDto[],
     new_author: ResponseAuthorDto,
-  ): Promise<ResponseBookDto> {
+  ) {
     if ('title' in updateBookDto)
       updateBookDto.title = updateBookDto.title.toLowerCase();
 
@@ -157,13 +157,13 @@ export class BookService {
         data: {
           ...data,
           genres: {
-            connect: genres_data,
+            set: genres_data,
           },
           author_id: new_author.id,
         },
       });
 
-      return new ResponseBookDto(updated_book);
+      return updated_book;
     } catch (error) {
       throw new HttpException(
         `Error in updating book : \n ${error}`,
