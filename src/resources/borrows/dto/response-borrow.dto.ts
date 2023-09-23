@@ -61,3 +61,30 @@ export class ResponseBorrowDto {
   @Exclude()
   updated_at: Date;
 }
+
+export class ResponseCreateUpdateBorrowDto {
+  constructor(partial: Partial<ResponseCreateUpdateBorrowDto>) {
+    Object.assign(this, partial);
+  }
+  expires: boolean;
+
+  returned: boolean;
+
+  date_of_borrow: Date;
+
+  deadline: Date;
+
+  book_id: string;
+
+  @Exclude()
+  user_id: string;
+
+  @Exclude()
+  id: string;
+
+  @Exclude()
+  created_at: Date;
+
+  @Exclude()
+  updated_at: Date;
+}

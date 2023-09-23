@@ -8,7 +8,10 @@ import {
 import { CreateBorrowDto } from './dto/create-borrow.dto';
 import { UpdateBorrowDto } from './dto/update-borrow.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseBorrowDto } from './dto/response-borrow.dto';
+import {
+  ResponseBorrowDto,
+  ResponseCreateUpdateBorrowDto,
+} from './dto/response-borrow.dto';
 
 @Injectable()
 export class BorrowsService {
@@ -17,20 +20,21 @@ export class BorrowsService {
   async create(
     createBorrowDto: CreateBorrowDto,
     user_id: string,
-  ): Promise<ResponseBorrowDto> {
+  ): Promise<ResponseCreateUpdateBorrowDto> {
     const hasBorrowed = await this.findOneByBookId(createBorrowDto.book_id);
 
-    if (hasBorrowed) {
+    if (Object.keys(hasBorrowed).length !== 0) {
       throw new ConflictException('This book has already been borrowed');
     }
     try {
       const borrow = await this.prismaService.borrows.create({
         data: {
           ...createBorrowDto,
+          date_of_borrow: new Date(),
           user_id,
         },
       });
-      return new ResponseBorrowDto(borrow);
+      return new ResponseCreateUpdateBorrowDto(borrow);
     } catch (error) {
       throw new HttpException(
         `Error in borrowing a book : \n ${error}`,
@@ -114,7 +118,7 @@ export class BorrowsService {
   async update(
     id: string,
     updateBorrowDto: UpdateBorrowDto,
-  ): Promise<ResponseBorrowDto> {
+  ): Promise<ResponseCreateUpdateBorrowDto> {
     const isBorrow = await this.findOne(id);
 
     if (!isBorrow) {
@@ -129,7 +133,7 @@ export class BorrowsService {
         data: updateBorrowDto,
       });
 
-      return new ResponseBorrowDto(updated_borrow);
+      return new ResponseCreateUpdateBorrowDto(updated_borrow);
     } catch (error) {
       throw new HttpException(
         `Error in getting a borrow by book ID : \n ${error}`,

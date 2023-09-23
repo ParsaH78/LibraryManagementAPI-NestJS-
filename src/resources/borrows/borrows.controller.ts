@@ -27,12 +27,7 @@ export class BorrowsController {
     if (!user) {
       throw new UnauthorizedException('You need to login first');
     }
-    // const book = await this.bookService.findOne(createBorrowDto.book_id);
-    // if (!book.borrowed.returned) {
-    //   throw new ConflictException(
-    //     'This book has been borrowed by someone else',
-    //   );
-    // }
+
     return this.borrowsService.create(createBorrowDto, user.id);
   }
 
@@ -58,7 +53,7 @@ export class BorrowsController {
 
     const isBorrow = await this.borrowsService.findOne(id);
 
-    if (!isBorrow) {
+    if (Object.keys(isBorrow).length === 0) {
       throw new NotFoundException('There is no score with this ID');
     }
 
@@ -80,13 +75,13 @@ export class BorrowsController {
 
     const isBorrow = await this.borrowsService.findOne(id);
 
-    if (!isBorrow) {
-      throw new NotFoundException('There is no score with this ID');
+    if (Object.keys(isBorrow).length === 0) {
+      throw new NotFoundException('There is no borrow with this ID');
     }
 
     if (isBorrow.user_id !== user.id) {
       throw new UnauthorizedException(
-        "You are not allowed to change other's scores",
+        "You are not allowed to change other's borrows",
       );
     }
     return this.borrowsService.remove(id);
