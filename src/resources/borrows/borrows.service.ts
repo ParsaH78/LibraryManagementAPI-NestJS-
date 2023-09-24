@@ -125,6 +125,13 @@ export class BorrowsService {
       throw new NotFoundException('This user did not borrow this book');
     }
 
+    if (
+      updateBorrowDto?.returned === true &&
+      !('date_of_return' in updateBorrowDto)
+    ) {
+      updateBorrowDto.date_of_return = new Date();
+    }
+
     try {
       const updated_borrow = await this.prismaService.borrows.update({
         where: {

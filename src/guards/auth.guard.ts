@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -31,6 +36,10 @@ export class AuthGuard implements CanActivate {
           token,
           process.env.JWT_SECRET,
         )) as JWTPayload;
+
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        const is_expired = payload.exp && payload.exp < currentTimestamp;
+        if (is_expired) throw new UnauthorizedException('Token is expired');
 
         const user = await this.prismaService.user.findUnique({
           where: {

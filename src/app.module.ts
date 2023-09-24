@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import * as redisStore from 'cache-manager-redis-store';
 import { AuthModule } from './resources/auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
@@ -11,9 +12,21 @@ import { GenreModule } from './resources/genre/genre.module';
 import { BorrowsModule } from './resources/borrows/borrows.module';
 import { UserModule } from './resources/user/user.module';
 import { BookModule } from './resources/book/book.module';
+import {
+  CacheInterceptor,
+  CacheModule,
+  CacheStore,
+} from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 36000,
+      store: redisStore as unknown as CacheStore,
+      host: 'localhost',
+      port: 6379,
+    }),
     AuthModule,
     PrismaModule,
     UserModule,
@@ -33,6 +46,10 @@ import { BookModule } from './resources/book/book.module';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
     },
   ],
 })

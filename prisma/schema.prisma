@@ -42,6 +42,7 @@ model Borrows {
   expires        Boolean  @default(false)
   returned       Boolean  @default(false)
   date_of_borrow DateTime
+  date_of_return DateTime?
   book_id        String   @unique
   book           Book     @relation(fields: [book_id], references: [id], onDelete: NoAction)
   user_id        String

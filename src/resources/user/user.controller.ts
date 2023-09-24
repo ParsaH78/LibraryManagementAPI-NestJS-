@@ -23,6 +23,11 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Get('/history')
+  getBorrowHistory(@User() user: UserInfo) {
+    return this.userService.getBorrowHistory(user.id);
+  }
+
   @Get()
   findAll() {
     return this.userService.findAll();
@@ -41,10 +46,5 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
-  }
-
-  @Get('/history')
-  getBorrowHistory(@User() user: UserInfo) {
-    return this.userService.getBorrowHistory(user.id);
   }
 }
