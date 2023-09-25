@@ -173,51 +173,65 @@ export class UserService {
   }
 
   async getBorrowHistory(user_id: string) {
-    const history = await this.prismaService.borrows.findMany({
-      where: {
-        user_id,
-        returned: true,
-      },
-      include: {
-        book: {
-          select: {
-            title: true,
-            author: {
-              select: {
-                name: true,
+    try {
+      const history = await this.prismaService.borrows.findMany({
+        where: {
+          user_id,
+          returned: true,
+        },
+        include: {
+          book: {
+            select: {
+              title: true,
+              author: {
+                select: {
+                  name: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
 
-    return history;
+      return history;
+    } catch (error) {
+      throw new HttpException(
+        `Error in getting user borrow history : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async searchUsers(username: string): Promise<ResponseUserDto[]> {
-    const homes = await this.prismaService.user.findMany({
-      where: {
-        username: {
-          contains: username,
-        },
-      },
-      include: {
-        scores: {
-          select: {
-            score: true,
+    try {
+      const homes = await this.prismaService.user.findMany({
+        where: {
+          username: {
+            contains: username,
           },
         },
-        comments: {
-          select: {
-            comment: true,
+        include: {
+          scores: {
+            select: {
+              score: true,
+            },
+          },
+          comments: {
+            select: {
+              comment: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return homes.map((home) => {
-      return new ResponseUserDto(home);
-    });
+      return homes.map((home) => {
+        return new ResponseUserDto(home);
+      });
+    } catch (error) {
+      throw new HttpException(
+        `Error in searching users : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

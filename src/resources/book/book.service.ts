@@ -58,64 +58,71 @@ export class BookService {
     if (isNaN(filters.max_published_at.getTime()))
       filters.max_published_at = new Date();
 
-    const books = await this.prismaService.book.findMany({
-      where: {
-        AND: [
-          { title: { contains: filters.title } },
-          { description: { contains: filters.description } },
-          {
-            AND: [
-              { pages: { gte: filters.min_pages } },
-              { pages: { lte: filters.max_pages } },
-            ],
-          },
-          {
-            AND: [
-              { published_at: { gte: filters.min_published_at } },
-              { published_at: { lte: filters.max_published_at } },
-            ],
-          },
-          {
-            author: {
-              name: { contains: filters.author_name },
+    try {
+      const books = await this.prismaService.book.findMany({
+        where: {
+          AND: [
+            { title: { contains: filters.title } },
+            { description: { contains: filters.description } },
+            {
+              AND: [
+                { pages: { gte: filters.min_pages } },
+                { pages: { lte: filters.max_pages } },
+              ],
             },
-          },
-          {
-            AND: [
-              { total_score: { gte: filters.min_total_score } },
-              { total_score: { lte: filters.max_total_score } },
-            ],
-          },
-          { cover_pic: { contains: filters.cover_pic } },
-          {
-            genres: {
-              some: {
-                genre: {
-                  in: filters.genres,
+            {
+              AND: [
+                { published_at: { gte: filters.min_published_at } },
+                { published_at: { lte: filters.max_published_at } },
+              ],
+            },
+            {
+              author: {
+                name: { contains: filters.author_name },
+              },
+            },
+            {
+              AND: [
+                { total_score: { gte: filters.min_total_score } },
+                { total_score: { lte: filters.max_total_score } },
+              ],
+            },
+            { cover_pic: { contains: filters.cover_pic } },
+            {
+              genres: {
+                some: {
+                  genre: {
+                    in: filters.genres,
+                  },
                 },
               },
             },
+          ],
+        },
+        include: {
+          author: {
+            select: {
+              name: true,
+            },
           },
-        ],
-      },
-      include: {
-        author: {
-          select: {
-            name: true,
+          genres: {
+            select: {
+              genre: true,
+              id: true,
+            },
           },
         },
-        genres: {
-          select: {
-            genre: true,
-            id: true,
-          },
-        },
-      },
-    });
+      });
 
-    return books.map((book) => {
-      return new ResponseBookDto(book);
-    });
+      return books.map((book) => {
+        return new ResponseBookDto(book);
+      });
+    } catch (error) {
+      throw new HttpException(
+        `Error in searching books : \n ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findAll(): Promise<ResponseBookDto[]> {
