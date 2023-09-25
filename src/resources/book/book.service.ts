@@ -14,6 +14,7 @@ import { GenreService } from 'src/resources/genre/genre.service';
 import { ResponseGenreDto } from 'src/resources/genre/dto/response-genre.dto';
 import { ErrorInterface } from './interfaces/error.interface';
 import { ResponseAuthorDto } from '../author/dto';
+import { FilterBookDto } from './dto/filter-book.dto';
 
 @Injectable()
 export class BookService {
@@ -48,6 +49,73 @@ export class BookService {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  async searchBooks(filters: FilterBookDto): Promise<ResponseBookDto[]> {
+    if (isNaN(filters.min_published_at.getTime()))
+      filters.min_published_at = new Date('1000-01-01');
+
+    if (isNaN(filters.max_published_at.getTime()))
+      filters.max_published_at = new Date();
+
+    const books = await this.prismaService.book.findMany({
+      where: {
+        AND: [
+          { title: { contains: filters.title } },
+          { description: { contains: filters.description } },
+          {
+            AND: [
+              { pages: { gte: filters.min_pages } },
+              { pages: { lte: filters.max_pages } },
+            ],
+          },
+          {
+            AND: [
+              { published_at: { gte: filters.min_published_at } },
+              { published_at: { lte: filters.max_published_at } },
+            ],
+          },
+          {
+            author: {
+              name: { contains: filters.author_name },
+            },
+          },
+          {
+            AND: [
+              { total_score: { gte: filters.min_total_score } },
+              { total_score: { lte: filters.max_total_score } },
+            ],
+          },
+          { cover_pic: { contains: filters.cover_pic } },
+          {
+            genres: {
+              some: {
+                genre: {
+                  in: filters.genres,
+                },
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
+        genres: {
+          select: {
+            genre: true,
+            id: true,
+          },
+        },
+      },
+    });
+
+    return books.map((book) => {
+      return new ResponseBookDto(book);
+    });
   }
 
   async findAll(): Promise<ResponseBookDto[]> {

@@ -10,6 +10,7 @@ import {
   ConflictException,
   NotFoundException,
   HttpException,
+  Query,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -19,6 +20,7 @@ import { GenreService } from 'src/resources/genre/genre.service';
 import { ResponseGenreDto } from 'src/resources/genre/dto/response-genre.dto';
 import { ErrorInterface } from './interfaces/error.interface';
 import { ResponseAuthorDto } from '../author/dto';
+import { FilterBookDto } from './dto/filter-book.dto';
 
 @Controller('book')
 export class BookController {
@@ -46,6 +48,37 @@ export class BookController {
     if (err) throw new HttpException(err.message, err.code);
 
     return this.bookService.create(createBookDto, genre_data, author);
+  }
+
+  @Get('/search')
+  searchBooks(
+    @Query('title') title?: string,
+    @Query('description') description?: string,
+    @Query('min_pages') min_pages?: number,
+    @Query('max_pages') max_pages?: number,
+    @Query('min_published_at') min_published_at?: Date,
+    @Query('max_published_at') max_published_at?: Date,
+    @Query('min_total_score') min_total_score?: number,
+    @Query('max_total_score') max_total_score?: number,
+    @Query('author_name') author_name?: string,
+    @Query('cover_pic') cover_pic?: string,
+    @Query('genres') genres?: string[],
+  ) {
+    const filters: FilterBookDto = {
+      ...(title && { title }),
+      ...(description && { description }),
+      ...(min_pages && { min_pages }),
+      ...(max_pages && { max_pages }),
+      ...(min_published_at && { min_published_at }),
+      ...(max_published_at && { max_published_at }),
+      ...(min_total_score && { min_total_score }),
+      ...(max_total_score && { max_total_score }),
+      ...(author_name && { author_name }),
+      ...(cover_pic && { cover_pic }),
+      ...(genres && { genres }),
+    };
+
+    return this.bookService.searchBooks(filters);
   }
 
   @Get()

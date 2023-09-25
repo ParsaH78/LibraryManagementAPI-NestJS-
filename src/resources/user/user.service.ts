@@ -194,4 +194,30 @@ export class UserService {
 
     return history;
   }
+
+  async searchUsers(username: string): Promise<ResponseUserDto[]> {
+    const homes = await this.prismaService.user.findMany({
+      where: {
+        username: {
+          contains: username,
+        },
+      },
+      include: {
+        scores: {
+          select: {
+            score: true,
+          },
+        },
+        comments: {
+          select: {
+            comment: true,
+          },
+        },
+      },
+    });
+
+    return homes.map((home) => {
+      return new ResponseUserDto(home);
+    });
+  }
 }
